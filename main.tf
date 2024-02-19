@@ -59,7 +59,7 @@ module "alb" {
   security_groups = module.blog_sg.security_group_id 
 
   listeners = {
-    ex-http -redirect = {
+    ex-http-https-redirect = {
       port     = 80
       protocol = "HTTP"
       redirect = {
