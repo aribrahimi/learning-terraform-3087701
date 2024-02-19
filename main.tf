@@ -79,6 +79,7 @@ module "alb" {
       targets = {
         my_target = {
           target_id = aws_instance.web.id
+          port = 80
         }
       }
     }
