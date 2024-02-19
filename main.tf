@@ -49,3 +49,44 @@ module "blog_vpc" {
     Environment = "dev"
   }
 }
+
+module "alb" {
+  source = "terraform-aws-modules/alb/aws"
+
+  name    = "blog-alb"
+  vpc_id  = module.blog_vpc.vpc_id
+  subnets = module.blog_vpc.public_subnets
+  security_groups = module.blog_sg.security_group_id 
+
+  listeners = {
+    ex-http -redirect = {
+      port     = 80
+      protocol = "HTTP"
+      redirect = {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+  }
+
+  target_groups = [
+    {
+      name_prefix      = "blog"
+      protocol         = "HTTP"
+      port             = 80
+      target_type      = "instance"
+      targets = {
+        my_target = {
+          target_id = aws_instance.web.id
+        }
+      }
+    }
+  ]
+
+
+  tags = {
+    Environment = "dev"
+    Project     = "Example"
+  }
+} 
